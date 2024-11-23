@@ -34,7 +34,7 @@ void Server::start()
     {
         Worker *worker = new Worker(i);
         worker->start(client_queue_, shutdown_);
-        workers_.emplace_back(std::move(worker));
+        workers_.emplace_back(worker);
     }
 }
 

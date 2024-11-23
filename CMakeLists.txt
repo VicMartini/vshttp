@@ -15,6 +15,8 @@ file(GLOB SOURCES "src/*.cpp")
 
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "build")
 
+
+
 # Add executable
 add_executable(vshttp ${SOURCES})
 
@@ -27,4 +29,12 @@ add_custom_target(run
     DEPENDS vshttp
     WORKING_DIRECTORY ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}
     COMMENT "Running vshttp from the build directory"
+)
+
+
+# Run formatter
+add_custom_target(format
+    COMMAND find src -name '*.hpp' -o -name '*.cpp' | xargs clang-format -i
+    WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
+    COMMENT "Formatting source files"
 )

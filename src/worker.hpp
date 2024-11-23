@@ -1,7 +1,7 @@
 #ifndef WORKER_HPP
 #define WORKER_HPP
 
-#include "threadsafe_queue.hpp"
+#include "plumbing/threadsafe_queue.hpp"
 #include <queue>
 #include <thread>
 class Worker

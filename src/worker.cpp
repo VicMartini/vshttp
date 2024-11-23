@@ -1,5 +1,7 @@
 #include "worker.hpp"
 
+#include "parser/httprequestparser.hpp"
+#include "parser/httpresponseparser.hpp"
 #include <cstring>
 #include <iostream>
 #include <unistd.h>
@@ -34,32 +36,61 @@ void Worker::wait()
 
 void Worker::handleRequest(int client_fd)
 {
-    std::cout << "Worker " << id_ << " handling request" << std::endl;
-    const char *message = "I'm a teapot!";
-    const char *response = "HTTP/1.1 418 I'm a teapot\r\n"
-                           "Content-Length: 13\r\n"
-                           "Connection: close\r\n"
-                           "\r\n"
-                           "I'm a teapot!";
-
-    size_t total_length = strlen(response);
-    size_t bytes_sent = 0;
-
-    // Keep writing until all bytes are sent or an error occurs
-    while (bytes_sent < total_length)
+    char buffer[4096];
+    ssize_t bytes_read = read(client_fd, buffer, sizeof(buffer));
+    if (bytes_read < 0)
     {
-        ssize_t bytes_written = write(client_fd, response + bytes_sent, total_length - bytes_sent);
-        if (bytes_written < 0)
-        {
-            if (errno == EINTR)
-            {
-                // System call was interrupted, try again
-                continue;
-            }
-            std::cerr << "Failed to write to client socket: " << strerror(errno) << std::endl;
-            break;
-        }
-        bytes_sent += bytes_written;
+        std::cerr << "Failed to read from client socket: " << strerror(errno) << std::endl;
+        return;
+    }
+
+    httpparser::HttpRequestParser parser;
+    httpparser::Request request;
+    httpparser::HttpRequestParser::ParseResult res = parser.parse(request, buffer, buffer + bytes_read);
+
+    if (res == httpparser::HttpRequestParser::ParsingError)
+    {
+        std::cerr << "Failed to parse HTTP request" << std::endl;
+        return;
+    }
+    else if (res == httpparser::HttpRequestParser::ParsingIncompleted)
+    {
+        std::cerr << "Incomplete HTTP request" << std::endl;
+        return;
+    }
+
+    std::cout << "Received request: " << request.inspect() << std::endl;
+
+    // Create a response
+    httpparser::Response response;
+    response.versionMajor = 1;
+    response.versionMinor = 1;
+    response.statusCode = 200;
+    response.status = "OK";
+    response.keepAlive = request.keepAlive;
+
+    // Add headers
+    httpparser::Response::HeaderItem contentTypeHeader;
+    contentTypeHeader.name = "Content-Type";
+    contentTypeHeader.value = "text/plain";
+    response.headers.push_back(contentTypeHeader);
+
+    httpparser::Response::HeaderItem contentLengthHeader;
+    contentLengthHeader.name = "Content-Length";
+    contentLengthHeader.value = "2";
+    response.headers.push_back(contentLengthHeader);
+
+    // Add content
+    response.content.assign({'O', 'K'});
+
+    // Serialize response
+    std::string responseStr = response.inspect();
+
+    // Send response
+    ssize_t bytes_written = write(client_fd, responseStr.c_str(), responseStr.size());
+    if (bytes_written < 0)
+    {
+        std::cerr << "Failed to write to client socket: " << strerror(errno) << std::endl;
     }
 
     // Close the client socket

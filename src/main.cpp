@@ -1,5 +1,5 @@
-#include <iostream>
 #include "server.hpp"
+#include <iostream>
 
 #include <csignal>
 

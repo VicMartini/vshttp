@@ -1,14 +1,14 @@
 #include "server.hpp"
 
+#include <arpa/inet.h>
 #include <cerrno>
+#include <iostream>
 #include <netinet/in.h>
 #include <stdexcept>
 #include <sys/socket.h>
 #include <system_error>
-#include <unistd.h>
-#include <iostream>
-#include <arpa/inet.h>
 #include <thread>
+#include <unistd.h>
 
 // Public methods
 Server::Server(int port, size_t num_workers) : port_(port), num_workers_(num_workers)
@@ -121,15 +121,15 @@ void Server::acceptClient()
     {
         throw std::system_error(errno, std::system_category(), "Failed to accept connection");
     }
-    // Add to queue so a worker can pick it up, no need to lock, see threadsafe_queue.hpp
+    // Add to queue so a worker can pick it up, no need to lock, see
+    // threadsafe_queue.hpp
     client_queue_.push(client_fd);
 
     // Log the new connection
     std::string client_ip = inet_ntoa(client_addr.sin_addr);
     uint16_t client_port = ntohs(client_addr.sin_port);
 
-    std::cout << "New connection from " << client_ip
-              << ":" << client_port << std::endl;
+    std::cout << "New connection from " << client_ip << ":" << client_port << std::endl;
     std::cout << "Queue size: " << client_queue_.size() << std::endl;
 }
 
@@ -146,7 +146,6 @@ void Server::startListening()
 {
     if (listen(socket_fd_, 10) < 0)
     {
-        throw std::system_error(errno, std::system_category(),
-                                "Failed when calling listen");
+        throw std::system_error(errno, std::system_category(), "Failed when calling listen");
     }
 }

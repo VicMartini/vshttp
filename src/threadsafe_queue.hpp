@@ -1,15 +1,14 @@
 #ifndef THREADSAFE_QUEUE_HPP
 #define THREADSAFE_QUEUE_HPP
 
-#include <queue>
-#include <mutex>
-#include <condition_variable>
 #include <chrono>
+#include <condition_variable>
+#include <mutex>
+#include <queue>
 
-template <typename T>
-class ThreadsafeQueue
+template <typename T> class ThreadsafeQueue
 {
-public:
+  public:
     ThreadsafeQueue() = default;
     ~ThreadsafeQueue() = default;
 
@@ -18,7 +17,7 @@ public:
     bool empty() const;
     size_t size() const;
 
-private:
+  private:
     std::queue<T> queue_;
     mutable std::mutex mutex_;
     std::condition_variable cv_;

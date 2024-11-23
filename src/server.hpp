@@ -1,7 +1,7 @@
 #ifndef SERVER_HPP
 #define SERVER_HPP
 
-#include "threadsafe_queue.hpp"
+#include "plumbing/threadsafe_queue.hpp"
 #include "worker.hpp"
 #include <netinet/in.h>
 #include <queue>

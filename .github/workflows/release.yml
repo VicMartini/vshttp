@@ -31,6 +31,10 @@ jobs:
   release:
     needs: build
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      repository-projects: write
+      pull-requests: write
 
     steps:
       - name: Checkout repository

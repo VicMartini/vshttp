@@ -6,7 +6,7 @@ on:
       - master
 
 jobs:
-  build:
+  build-linux:
     runs-on: ubuntu-latest
 
     steps:
@@ -17,19 +17,41 @@ jobs:
         uses: lukka/get-cmake@latest
 
       - name: Configure CMake
-        run: cmake .
+        run: cmake -B build
 
       - name: Build
-        run: make
+        run: cmake --build build --config Release
 
-      - name: Archive build artifacts
+      - name: Archive Linux build artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: vshttp-binaries
-          path: build/
+          name: vshttp-linux-binaries
+          path: build/vshttp
+
+  build-macos:
+    runs-on: macos-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+
+      - name: Set up CMake
+        uses: lukka/get-cmake@latest
+
+      - name: Configure CMake
+        run: cmake -B build
+
+      - name: Build
+        run: cmake --build build --config Release
+
+      - name: Archive macOS build artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: vshttp-macos-binaries
+          path: build/vshttp
 
   release:
-    needs: build
+    needs: [build-linux, build-macos]
     runs-on: ubuntu-latest
     permissions:
       contents: write
@@ -40,11 +62,17 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v2
 
-      - name: Download build artifacts
+      - name: Download Linux build artifacts
         uses: actions/download-artifact@v4
         with:
-          name: vshttp-binaries
-          path: build/
+          name: vshttp-linux-binaries
+          path: build/linux
+
+      - name: Download macOS build artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: vshttp-macos-binaries
+          path: build/macos
 
       - name: Extract version from CMakeLists.txt
         id: extract_version
@@ -64,12 +92,22 @@ jobs:
           draft: false
           prerelease: false
 
-      - name: Upload Release Asset
+      - name: Upload Linux Release Asset
         uses: actions/upload-release-asset@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: build/vshttp
-          asset_name: vshttp
+          asset_path: build/linux/vshttp
+          asset_name: vshttp-linux
+          asset_content_type: application/octet-stream
+
+      - name: Upload macOS Release Asset
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: build/macos/vshttp
+          asset_name: vshttp-macos
           asset_content_type: application/octet-stream

@@ -1,6 +1,8 @@
 # vshttp
 
-A very simple HTTP server written in C++20.
+A very simple HTTP server written in C++.
+
+**WARNING:** In the unlikely case that you are considering using this in production, please don't. I'm writing this mainly to learn C++ and it's absolutely not production ready.
 
 ## Build
 
@@ -14,4 +16,6 @@ make
 make run
 ```
 
-_WARNING:_ In the unlikely case that you are considering using this in production, please don't. I'm writing this mainly to learn C++ and it's absolutely not production ready.
+## Releases
+
+In the releses section you can find a fat binary for arm64/x86_64.

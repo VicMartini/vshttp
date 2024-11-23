@@ -5,10 +5,9 @@ project(vshttp VERSION 0.0.1)
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED True)
 
-# Set architecture for macOS
-if(APPLE)
-    set(CMAKE_OSX_ARCHITECTURES "arm64;x86_64")
-endif()
+# Build a fat binary for arm64/x86_64
+set(CMAKE_OSX_ARCHITECTURES "arm64;x86_64")
+
 
 # Collect source files
 file(GLOB SOURCES "src/*.cpp")

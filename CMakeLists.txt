@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.10)
 
-project(vshttp VERSION 1.0)
+project(vshttp VERSION 0.0.1)
 
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED True)

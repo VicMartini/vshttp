@@ -1,15 +1,15 @@
 #ifndef SERVER_HPP
 #define SERVER_HPP
 
+#include "threadsafe_queue.hpp"
+#include "worker.hpp"
 #include <netinet/in.h>
 #include <queue>
-#include <vector>
 #include <thread>
-#include "worker.hpp"
-#include "threadsafe_queue.hpp"
+#include <vector>
 class Server
 {
-public:
+  public:
     explicit Server(int port, size_t num_workers);
 
     ~Server();
@@ -19,7 +19,7 @@ public:
     void wait();
     void shutdown();
 
-private:
+  private:
     sockaddr_in createSockAddr() const;
     void bindSocket();
     void startListening();

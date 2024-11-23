@@ -1,15 +1,16 @@
 #include "worker.hpp"
 
-#include <iostream>
 #include <cstring>
+#include <iostream>
 #include <unistd.h>
 
-Worker::Worker(size_t id) : id_(id) {}
+Worker::Worker(size_t id) : id_(id)
+{
+}
 
 void Worker::start(ThreadsafeQueue<int> &client_queue, bool &shutdown)
 {
-    thread_ = std::thread([this, &client_queue, &shutdown]()
-                          { this->serviceClients(client_queue, shutdown); });
+    thread_ = std::thread([this, &client_queue, &shutdown]() { this->serviceClients(client_queue, shutdown); });
 }
 
 void Worker::serviceClients(ThreadsafeQueue<int> &client_queue, bool &shutdown)
@@ -47,8 +48,7 @@ void Worker::handleRequest(int client_fd)
     // Keep writing until all bytes are sent or an error occurs
     while (bytes_sent < total_length)
     {
-        ssize_t bytes_written = write(client_fd, response + bytes_sent,
-                                      total_length - bytes_sent);
+        ssize_t bytes_written = write(client_fd, response + bytes_sent, total_length - bytes_sent);
         if (bytes_written < 0)
         {
             if (errno == EINTR)
@@ -56,8 +56,7 @@ void Worker::handleRequest(int client_fd)
                 // System call was interrupted, try again
                 continue;
             }
-            std::cerr << "Failed to write to client socket: "
-                      << strerror(errno) << std::endl;
+            std::cerr << "Failed to write to client socket: " << strerror(errno) << std::endl;
             break;
         }
         bytes_sent += bytes_written;
@@ -66,7 +65,6 @@ void Worker::handleRequest(int client_fd)
     // Close the client socket
     if (close(client_fd) < 0)
     {
-        std::cerr << "Failed to close client socket: "
-                  << strerror(errno) << std::endl;
+        std::cerr << "Failed to close client socket: " << strerror(errno) << std::endl;
     }
 }

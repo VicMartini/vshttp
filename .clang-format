@@ -1,0 +1,4 @@
+---
+BasedOnStyle: Microsoft
+# I like Microsft's style because it uses Allman braces and I find that it
+# feels more spacious and readable.

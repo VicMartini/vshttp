@@ -51,6 +51,7 @@ void Server::wait()
     if (acceptor_thread_.joinable())
     {
         acceptor_thread_.join();
+        std::cout << "Acceptor thread finished" << std::endl;
     }
 
     // Wait for all workers
@@ -58,35 +59,20 @@ void Server::wait()
     {
         worker->wait();
     }
+    workers_.clear();
 }
 
 void Server::shutdown()
 {
     shutdown_ = true;
-
-    // Close the server socket to stop accepting new connections
+    // Close the listening socket, this will wake up the acceptor thread
     if (socket_fd_ >= 0)
     {
         close(socket_fd_);
         socket_fd_ = -1;
     }
 
-    // Wake up all workers
-    client_queue_.push(-1);
-
-    // Wait for the acceptor thread to finish
-    if (acceptor_thread_.joinable())
-    {
-        acceptor_thread_.join();
-    }
-
-    // Wait for all workers to finish
-    for (auto &worker : workers_)
-    {
-        worker->wait();
-        delete worker;
-    }
-    workers_.clear();
+    client_queue_.shutdown();
 }
 
 // Private methods
@@ -119,9 +105,10 @@ void Server::acceptClient()
     // Accept connection
     if ((client_fd = accept(socket_fd_, (struct sockaddr *)&client_addr, &client_len)) < 0)
     {
+        std::cerr << "Failed to accept connection" << std::endl;
         throw std::system_error(errno, std::system_category(), "Failed to accept connection");
     }
-    // Add to queue so a worker can pick it up, no need to lock, see
+    // Add to queue so a worker can pick it up, locking is handled internally see
     // threadsafe_queue.hpp
     client_queue_.push(client_fd);
 
@@ -135,10 +122,21 @@ void Server::acceptClient()
 
 void Server::acceptClients()
 {
-    std::cout << "Accepting clients" << std::endl;
-    while (!shutdown_)
+    try
     {
-        acceptClient();
+        while (!shutdown_)
+        {
+            acceptClient();
+        }
+    }
+    catch (const std::system_error &e)
+    {
+        if (shutdown_)
+        {
+            // If shutdown is in progress, break the loop
+            return;
+        }
+        std::cerr << "Exception in acceptClients: " << e.what() << std::endl;
     }
 }
 

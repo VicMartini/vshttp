@@ -28,7 +28,7 @@ class Server
 
     const int port_;
     const size_t num_workers_;
-    bool shutdown_{false};
+    std::atomic<bool> shutdown_{false};
     int socket_fd_{-1};
     sockaddr_in addr_{};
 

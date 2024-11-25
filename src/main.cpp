@@ -18,7 +18,8 @@ void handleShutdown(int signal)
 
 void printAsciiArt()
 {
-    std::cout << "\033[32m" << R"(
+    std::cout << "\033[32m" <<
+        R"(
 ░▒▓█▓▒░░▒▓█▓▒░░▒▓███████▓▒░▒▓█▓▒░░▒▓█▓▒░▒▓████████▓▒░▒▓████████▓▒░▒▓███████▓▒░  
 ░▒▓█▓▒░░▒▓█▓▒░▒▓█▓▒░      ░▒▓█▓▒░░▒▓█▓▒░  ░▒▓█▓▒░      ░▒▓█▓▒░   ░▒▓█▓▒░░▒▓█▓▒░ 
  ░▒▓█▓▒▒▓█▓▒░░▒▓█▓▒░      ░▒▓█▓▒░░▒▓█▓▒░  ░▒▓█▓▒░      ░▒▓█▓▒░   ░▒▓█▓▒░░▒▓█▓▒░ 
@@ -26,8 +27,8 @@ void printAsciiArt()
   ░▒▓█▓▓█▓▒░        ░▒▓█▓▒░▒▓█▓▒░░▒▓█▓▒░  ░▒▓█▓▒░      ░▒▓█▓▒░   ░▒▓█▓▒░        
   ░▒▓█▓▓█▓▒░        ░▒▓█▓▒░▒▓█▓▒░░▒▓█▓▒░  ░▒▓█▓▒░      ░▒▓█▓▒░   ░▒▓█▓▒░        
    ░▒▓██▓▒░  ░▒▓███████▓▒░░▒▓█▓▒░░▒▓█▓▒░  ░▒▓█▓▒░      ░▒▓█▓▒░   ░▒▓█▓▒░                                               
-    )" << "\033[0m"
-              << std::endl;
+    )"
+              << "\033[0m" << std::endl;
 }
 
 void printServerInfo(int port, const std::string &files_dir)
@@ -44,7 +45,9 @@ int main(int argc, char *argv[])
     size_t num_workers = 16;
     std::string files_dir = ".";
 
-    const struct option long_options[] = {{"port", required_argument, nullptr, 'p'},
+    const struct option long_options[] = {{"port", required_argument,
+
+                                           nullptr, 'p'},
                                           {"workers", required_argument, nullptr, 'w'},
                                           {"files_dir", required_argument, nullptr, 'f'},
                                           {nullptr, 0, nullptr, 0}};

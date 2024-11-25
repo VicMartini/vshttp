@@ -37,16 +37,21 @@ struct Response
 
     std::string inspect() const
     {
+        /**
+         * Serializes the response into a string.
+         */
         std::stringstream stream;
-        stream << "HTTP/" << versionMajor << "." << versionMinor << " " << statusCode << " " << status << "\n";
+        stream << "HTTP/" << versionMajor << "." << versionMinor << " " << statusCode << " " << status << "\r\n";
 
-        for (std::vector<Response::HeaderItem>::const_iterator it = headers.begin(); it != headers.end(); ++it)
+        for (const auto &header : headers)
         {
-            stream << it->name << ": " << it->value << "\n";
+            stream << header.name << ": " << header.value << "\r\n";
         }
 
+        stream << "\r\n";
+
         std::string data(content.begin(), content.end());
-        stream << data << "\n";
+        stream << data;
         return stream.str();
     }
 };

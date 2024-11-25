@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.10)
 
-project(vshttp VERSION 0.0.1)
+project(vshttp VERSION 0.0.2)
 
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED True)
@@ -25,10 +25,10 @@ set(CMAKE_CXX_COMPILER "clang++")
 
 # Run the executable from the build directory
 add_custom_target(run
-    COMMAND ./vshttp
+    COMMAND make .. && ./vshttp
     DEPENDS vshttp
     WORKING_DIRECTORY ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}
-    COMMENT "Running vshttp from the build directory"
+    COMMENT "Building and running vshttp from the build directory"
 )
 
 
